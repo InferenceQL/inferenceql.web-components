@@ -1,0 +1,12 @@
+{
+  "name": "@inferenceql/web-components",
+  "version": "0.0.1",
+  "dependencies": {
+    "@lit-labs/observers": "^2.0.0",
+    "highlight.js": "^11.8.0",
+    "json5": "^2.2.3",
+    "lit": "^2.8.0",
+    "papaparse": "^5.4.1",
+    "vega-embed": "^6.23.0"
+  }
+}
