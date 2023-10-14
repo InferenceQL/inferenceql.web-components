@@ -1,0 +1,87 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>inferenceql.web-components</title>
+
+    <style>
+
+      html {
+        max-width: 60ch;
+        padding: 3em 1em;
+        margin: auto;
+        line-height: 1.75;
+        color: black;
+        background-color: rgb(255 255 255 / 100%);
+      }
+
+      body {
+        width: 100%;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        html {
+          color: white;
+          background-color: rgb(0 0 0 / 85%);
+        }
+      }
+
+      h1,h2,h3,h4,h5,h6 {
+        margin: 1em 0 0.25em;
+      }
+
+      p,ul,ol {
+        color: #1d1d1d;
+        font-family: sans-serif;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        p,ul,ol {
+          color: #f4f4f4;
+        }
+      }
+
+    </style>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "highlight.js": "https://esm.sh/highlight.js@11.8.0/lib/core",
+          "papaparse": "https://esm.sh/papaparse@5.4.1",
+          "json5": "https://esm.sh/json5@2.2.3",
+          "lit": "https://esm.sh/lit@2.8.0",
+          "lit/directives/live.js": "https://esm.sh/lit@2.8.0/directives/live.js",
+          "lit/directives/ref.js": "https://esm.sh/lit@2.8.0/directives/ref.js",
+          "@lit-labs/observers/mutation-controller.js":  "https://esm.sh/@lit-labs/observers@2.0.0/mutation-controller.js",
+          "vega-embed": "https://esm.sh/vega-embed@6.23.0"
+        }
+      }
+    </script>
+
+    <script type="module" src="../csv-table.mjs"></script>
+    <script type="module" src="../iql-code.mjs"></script>
+    <script type="module" src="../iql-textarea.mjs"></script>
+    <script type="module" src="../vega-lite.mjs"></script>
+  </head>
+  <body>
+
+    <h1>iql-textarea</h1>
+    <iql-textarea>SELECT * FROM data</iql-textarea>
+
+    <h1>iql-code one line</h1>
+    <iql-code>SELECT * FROM data LIMIT 5</iql-code>
+
+    <h1>iql-code newlines</h1>
+    <iql-code>SELECT *
+FROM
+  GENERATE * UNDER model
+LIMIT 5</iql-code>
+
+    <h1>iql-code empty</h1>
+    <iql-code></iql-code>
+
+    <h1>textarea</h1>
+    <textarea></textarea>
+
+  </body>
+</html>
