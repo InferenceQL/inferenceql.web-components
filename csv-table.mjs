@@ -1,6 +1,7 @@
 import JSON5 from 'json5'
 import Papa from 'papaparse';
 import { LitElement, css, html, nothing } from 'lit';
+import { ifDefined } from 'lit-html/directives/if-defined';
 
 export class CSVTable extends LitElement {
   static styles = css`
@@ -34,10 +35,11 @@ export class CSVTable extends LitElement {
   static properties = {
     src:         { type: String },
     parseConfig: { type: Object, attribute: 'parse-config', converter: (s) => JSON5.parse(s) },
-
-    _fields: { type: Array, state: true },
-    _data:   { type: Array, state: true },
-    _errors: { type: Array, state: true }
+    _rowParts:   { type: Object, attribute: 'row-parts',    converter: (s) => JSON5.parse(s) },
+    _colParts:   { type: Object, attribute: 'col-parts',    converter: (s) => JSON5.parse(s) },
+    _headers:    { type: Array, state: true },
+    _data:       { type: Array, state: true },
+    _errors:     { type: Array, state: true }
   };
 
   constructor() {
@@ -58,11 +60,29 @@ export class CSVTable extends LitElement {
     });
 
     const text = await response.text();
-    const csv = Papa.parse(text, this.parseConfig);
+    const csv = Papa.parse(text.trim(), this.parseConfig);
 
-    this._fields = csv.meta.fields;
-    this._data = !this._fields ? csv.data : csv.data.map((datum) => this._fields.map((field) => datum[field]));
+    this._headers = csv.meta.fields;
+    // PapaParse will return an array of objects if `headers` is set. Otherwise
+    // it will return a two-dimensional array. We want the latter. Trun array of
+    // objects into a two-dimensional array if necessary.
+    this._data = !this._headers ? csv.data : csv.data.map((datum) => this._headers.map((field) => datum[field]));
     this._errors = csv.errors;
+  }
+
+  invertMap(obj) {
+    // Accepts an object where the values are arrays. Returns a map where each
+    // value in each array maps to the corresponding key. For example:
+    // ```
+    // { x: [0, 1, 2] } ; => { 0: "x", 1: "x", 2: "x" }
+    // ```
+    const invertedObj = {};
+    for (const [k, vs] of Object.entries(obj || {})) {
+      vs.forEach((v) => {
+        invertedObj[v] = k;
+      })
+    }
+    return (v) => invertedObj[v];
   }
 
   render() {
@@ -75,17 +95,41 @@ export class CSVTable extends LitElement {
       return nothing;
     }
 
-    const thead = !this._fields ? null : html`
+    const rowPart = this.invertMap(this._rowParts);
+    const colPart = this.invertMap(this._colParts);
+
+    const headerPart = (headerIndex) => {
+      const part = colPart(headerIndex);
+      return part ? part + ' header' : part;
+    };
+
+    const thead = !this._headers ? null : html`
       <thead>
-        ${this._fields.map((field) => html`<th>${field}</th>`)}
+        ${this._headers.map((header, headerIndex) => html`
+          <th part=${ifDefined(headerPart(headerIndex))}>
+            ${header}
+          </th>
+        `)}
       </thead>
+    `;
+
+    const renderCell = (cell, colIndex) => html`
+      <td part=${ifDefined(colPart(colIndex))}>
+        ${cell}
+      </td>
+    `;
+
+    const renderRow = (row, rowIndex) => html`
+      <tr part=${ifDefined(rowPart(rowIndex))}>
+        ${row.map(renderCell)}
+      </tr>
     `;
 
     return html`
       <table>
         ${thead}
         <tbody>
-          ${this._data.map((datum) => html`<tr>${datum.map((cell) => html`<td>${cell}</td>`)}</tr>`)}
+          ${this._data.map(renderRow)}
         </tbody>
       </table>
     `;

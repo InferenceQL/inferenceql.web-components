@@ -7,7 +7,7 @@
     <style>
 
       html {
-        max-width: 60ch;
+        /* max-width: 60ch; */
         padding: 3em 1em;
         margin: auto;
         line-height: 1.75;
@@ -17,6 +17,10 @@
 
       body {
         width: 100%;
+      }
+
+      csv-table {
+        margin: 1em;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -41,18 +45,30 @@
         }
       }
 
+      csv-table::part(demand) {
+        background-color: #ECC6BF
+      }
+
+      csv-table::part(supply) {
+        background-color: #C9C1D0
+      }
+
+      csv-table::part(conversion) {
+        background-color: #DEECD5
+      }
     </style>
 
     <script type="importmap">
       {
         "imports": {
+          "@lit-labs/observers/mutation-controller.js":  "https://esm.sh/@lit-labs/observers@2.0.0/mutation-controller.js",
           "highlight.js": "https://esm.sh/highlight.js@11.8.0/lib/core",
-          "papaparse": "https://esm.sh/papaparse@5.4.1",
           "json5": "https://esm.sh/json5@2.2.3",
           "lit": "https://esm.sh/lit@2.8.0",
+          "lit-html/directives/if-defined": "https://esm.sh/lit-html@3.0.0/directives/if-defined.js",
           "lit/directives/live.js": "https://esm.sh/lit@2.8.0/directives/live.js",
           "lit/directives/ref.js": "https://esm.sh/lit@2.8.0/directives/ref.js",
-          "@lit-labs/observers/mutation-controller.js":  "https://esm.sh/@lit-labs/observers@2.0.0/mutation-controller.js",
+          "papaparse": "https://esm.sh/papaparse@5.4.1",
           "vega-embed": "https://esm.sh/vega-embed@6.23.0"
         }
       }
@@ -82,6 +98,21 @@ LIMIT 5</iql-code>
 
     <h1>textarea</h1>
     <textarea></textarea>
+
+    <h1>CSV</h1>
+    <csv-table
+      src="homes.csv"
+      parse-config="{ header: true }"
+      col-parts="{ supply: [0,1], demand: [2,3,4], conversion: [5,6,7,8] }"
+    >
+    </csv-table>
+
+    <csv-table
+      src="homes.csv"
+      parse-config="{ header: true }"
+      row-parts="{ supply: [0,1], demand: [2,3,4], conversion: [5,6,7,8] }"
+    >
+    </csv-table>
 
   </body>
 </html>
