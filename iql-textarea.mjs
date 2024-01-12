@@ -53,14 +53,14 @@ class IQLTextarea extends LitElement {
   `;
 
   static properties = {
-    _content: { type: String },
+    value: { type: String },
   };
 
   textareaRef = createRef();
   codeRef = createRef();
 
   _handleInput(event) {
-    this._content = event.target.value;
+    this.value = event.target.value;
   }
 
   _handleScroll(event) {
@@ -70,11 +70,21 @@ class IQLTextarea extends LitElement {
 
   constructor() {
     super();
-    this._content = this.textContent || '';
+
+    const textContent = this.textContent || "";
+    const lines = textContent.split('\n');
+
+    // Remove leading and trailing empty lines.
+    while (/^\s*$/.test(lines[0])) lines.shift();
+    while (/^\s*$/.test(lines[lines.length - 1])) lines.pop();
+
+    // Remove leading spaces from remaining lines.
+    const numLeadingSpaces = lines.map((s) => s.match(/^\s*/)[0].length).reduce((acc, n) => Math.min(acc, n));
+    this.value = lines.map((s) => s.replace(new RegExp(`^\\s{0,${numLeadingSpaces}}`), '')).join('\n');
   }
 
   render() {
-    const text = this._content[this._content.length-1] == "\n" ? this._content + ' ' : this._content;
+    const text = this.value[this.value.length-1] == '\n' ? this.value + ' ' : this.value;
     return html`
       <textarea
         ref=${ref(this.textareaRef)}
