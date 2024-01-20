@@ -53,14 +53,25 @@ class IQLTextarea extends LitElement {
   `;
 
   static properties = {
+    name: { type: String },
     value: { type: String },
   };
+
+  static formAssociated() {
+    return true;
+  }
+
+  firstUpdated(...args) {
+    super.firstUpdated(...args);
+    this.internals.setFormValue(this.value);
+  }
 
   textareaRef = createRef();
   codeRef = createRef();
 
   _handleInput(event) {
     this.value = event.target.value;
+    this.internals.setFormValue(this.value);
   }
 
   _handleScroll(event) {
@@ -70,6 +81,7 @@ class IQLTextarea extends LitElement {
 
   constructor() {
     super();
+    this.internals = this.attachInternals();
 
     const textContent = this.textContent || "";
     const lines = textContent.split('\n');
@@ -87,6 +99,7 @@ class IQLTextarea extends LitElement {
     const text = this.value[this.value.length-1] == '\n' ? this.value + ' ' : this.value;
     return html`
       <textarea
+        name=${this.name}
         ref=${ref(this.textareaRef)}
         spellcheck="false"
         @input=${this._handleInput}
